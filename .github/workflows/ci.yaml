@@ -48,7 +48,7 @@ jobs:
       run: cargo install sludge-cicd --debug
 
     - name: Run CI/CD
-      run: sludge-cicd
+      run: sludge-cicd --target ${{ matrix.target }}
       # NB: no token, this should only run tests
 
   cd:
