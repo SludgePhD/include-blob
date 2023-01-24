@@ -107,16 +107,24 @@ fn write_archive(
 ) -> Result<()> {
     let mut symtab = BTreeMap::new();
     symtab.insert(object_file_name.to_vec(), vec![symbol_name.to_vec()]);
-    ar::GnuBuilder::new(
-        out_file,
-        vec![object_file_name.to_vec()],
-        ar::GnuSymbolTableFormat::Size32,
-        symtab,
-    )?
-    .append(
-        &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
-        &object_file_contents[..],
-    )?;
+
+    if use_gnu_archive() {
+        ar::GnuBuilder::new(
+            out_file,
+            vec![object_file_name.to_vec()],
+            ar::GnuSymbolTableFormat::Size32,
+            symtab,
+        )?
+        .append(
+            &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
+            &object_file_contents[..],
+        )?;
+    } else {
+        ar::Builder::new(out_file, symtab)?.append(
+            &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
+            &object_file_contents[..],
+        )?;
+    }
     Ok(())
 }
 
@@ -165,9 +173,9 @@ impl TargetInfo {
 }
 
 fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
-    if cfg!(unix) {
+    if env::var_os("CARGO_CFG_UNIX").is_some() {
         ("lib", ".a")
-    } else if cfg!(windows) {
+    } else if env::var_os("CARGO_CFG_WINDOWS").is_some() {
         ("", ".lib")
     } else {
         unimplemented!("target platform not supported");
@@ -175,9 +183,13 @@ fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
 }
 
 fn symbol_prefix() -> &'static str {
-    if cfg!(target_vendor = "apple") {
+    if env::var("CARGO_CFG_TARGET_VENDOR").as_deref() == Ok("apple") {
         "_"
     } else {
         ""
     }
+}
+
+fn use_gnu_archive() -> bool {
+    env::var("CARGO_CFG_TARGET_VENDOR").as_deref() != Ok("apple")
 }
