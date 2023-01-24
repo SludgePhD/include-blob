@@ -108,7 +108,7 @@ fn write_archive(
     let mut symtab = BTreeMap::new();
     symtab.insert(object_file_name.to_vec(), vec![symbol_name.to_vec()]);
 
-    if use_gnu_archive() {
+    if dbg!(use_gnu_archive()) {
         ar::GnuBuilder::new(
             out_file,
             vec![object_file_name.to_vec()],
@@ -120,7 +120,7 @@ fn write_archive(
             &object_file_contents[..],
         )?;
     } else {
-        ar::Builder::new(out_file, symtab)?.append(
+        ar::Builder::new(out_file, BTreeMap::new())?.append(
             &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
             &object_file_contents[..],
         )?;
@@ -183,7 +183,7 @@ fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
 }
 
 fn symbol_prefix() -> &'static str {
-    if env::var("CARGO_CFG_TARGET_VENDOR").as_deref() == Ok("apple") {
+    if &*env::var("CARGO_CFG_TARGET_VENDOR").unwrap() == "apple" {
         "_"
     } else {
         ""
@@ -191,5 +191,5 @@ fn symbol_prefix() -> &'static str {
 }
 
 fn use_gnu_archive() -> bool {
-    env::var("CARGO_CFG_TARGET_VENDOR").as_deref() != Ok("apple")
+    &*env::var("CARGO_CFG_TARGET_VENDOR").unwrap() != "apple"
 }
