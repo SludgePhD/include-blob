@@ -56,6 +56,9 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # pushes tags to the repo
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
