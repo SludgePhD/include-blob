@@ -5,11 +5,12 @@ members = ["include-blob-macros", "test-project"]
 name = "include-blob"
 version = "0.1.0"
 edition = "2021"
-license-file = "LICENSE"
+license = "0BSD"
 repository = "https://github.com/SludgePhD/Zaru"
 description = "Include large binary files in an application without incurring the compile time cost"
+keywords = ["include", "binary", "bytes", "file"]
 
 [dependencies]
-include-blob-macros = { path = "include-blob-macros" }
+include-blob-macros = { path = "include-blob-macros", version = "0.1.0" }
 object = { version = "0.30.0", default-features = false, features = ["write"] }
 ar = { version = "0.8.0", package = "sludge-ar-with-ranlib" }
