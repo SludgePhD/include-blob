@@ -34,7 +34,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -64,6 +64,6 @@ jobs:
       run: cargo install sludge-cicd --debug
 
     - name: Run CI/CD
-      run: sludge-cicd
+      run: ls && ls .. && sludge-cicd
       env:
         CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
