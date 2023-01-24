@@ -3,7 +3,7 @@ members = ["include-blob-macros", "test-project"]
 
 [package]
 name = "include-blob"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "0BSD"
 repository = "https://github.com/SludgePhD/Zaru"
