@@ -7,6 +7,7 @@ use std::{
     hash::{Hash, Hasher},
     io::{Seek, Write},
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use object::{
@@ -63,7 +64,8 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
 
     let (pre, post) = lib_prefix_and_suffix();
     let out_dir = env::var("OUT_DIR")?;
-    let mut out_file = File::create(format!("{out_dir}/{pre}{unique_name}{post}"))?;
+    let out_file_path = format!("{out_dir}/{pre}{unique_name}{post}");
+    let mut out_file = File::create(&out_file_path)?;
 
     let info = TargetInfo::from_build_script_vars();
     let mut obj_buf = Vec::new();
@@ -92,6 +94,18 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
 
     let object_file_name = format!("{unique_name}.o").into_bytes();
     write_archive(&mut out_file, &object_file_name, &obj_buf, &symbol_name)?;
+
+    if !use_gnu_archive() {
+        // builtin ranlib doesn't currently work on macOS, run external ranlib command
+        let out = Command::new("ranlib").arg(out_file_path).output()?;
+        if !out.status.success() {
+            panic!(
+                "failed to run ranlib: {:?}\nstderr:\n{}",
+                out.status,
+                String::from_utf8_lossy(&out.stderr)
+            );
+        }
+    }
 
     println!("cargo:rustc-link-lib=static={unique_name}");
     println!("cargo:rustc-link-search=native={out_dir}");
