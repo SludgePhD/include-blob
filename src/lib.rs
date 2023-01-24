@@ -61,8 +61,9 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
 
     let content = fs::read(&path)?;
 
+    let (pre, post) = lib_prefix_and_suffix();
     let out_dir = env::var("OUT_DIR")?;
-    let mut out_file = File::create(format!("{out_dir}/lib{unique_name}.a"))?;
+    let mut out_file = File::create(format!("{out_dir}/{pre}{unique_name}{post}"))?;
 
     let info = TargetInfo::from_build_script_vars();
     let mut obj_buf = Vec::new();
@@ -158,5 +159,15 @@ impl TargetInfo {
             arch,
             endian,
         }
+    }
+}
+
+fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
+    if cfg!(unix) {
+        ("lib", ".a")
+    } else if cfg!(windows) {
+        ("", ".lib")
+    } else {
+        unimplemented!("target platform not supported");
     }
 }
