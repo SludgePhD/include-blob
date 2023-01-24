@@ -57,6 +57,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Install Rust toolchain
       run: rustup install stable --profile=minimal
 
@@ -64,6 +69,6 @@ jobs:
       run: cargo install sludge-cicd --debug
 
     - name: Run CI/CD
-      run: ls && ls .. && sludge-cicd
+      run: sludge-cicd
       env:
         CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
