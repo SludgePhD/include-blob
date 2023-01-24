@@ -76,9 +76,7 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
         &[],
         1,
     );
-    let symbol_name = format!("{}{unique_name}", symbol_prefix())
-        .as_bytes()
-        .to_vec();
+    let symbol_name = unique_name.as_bytes().to_vec();
     let sym = object.add_symbol(Symbol {
         name: symbol_name.clone(),
         value: 0,
@@ -193,14 +191,6 @@ fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
         ("", ".lib")
     } else {
         unimplemented!("target platform not supported");
-    }
-}
-
-fn symbol_prefix() -> &'static str {
-    if &*env::var("CARGO_CFG_TARGET_VENDOR").unwrap() == "apple" {
-        "_"
-    } else {
-        ""
     }
 }
 
