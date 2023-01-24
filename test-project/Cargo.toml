@@ -1,0 +1,11 @@
+[package]
+name = "test-project"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+include-blob = { path = ".." }
+
+[build-dependencies]
+include-blob = { path = ".." }

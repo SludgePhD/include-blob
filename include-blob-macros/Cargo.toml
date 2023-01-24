@@ -1,0 +1,13 @@
+[package]
+name = "include-blob-macros"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+repository = "https://github.com/SludgePhD/Zaru"
+description = "Include large binary files in an application without incurring the compile time cost"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.107", default-features = false, features = ["parsing", "proc-macro"] }
