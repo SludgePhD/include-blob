@@ -3,10 +3,10 @@ members = ["include-blob-macros", "test-project"]
 
 [package]
 name = "include-blob"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "0BSD"
-repository = "https://github.com/SludgePhD/Zaru"
+repository = "https://github.com/SludgePhD/include-blob"
 description = "Include large binary files in an application without incurring the compile time cost"
 keywords = ["include", "binary", "bytes", "file"]
 
