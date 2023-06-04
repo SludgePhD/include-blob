@@ -35,6 +35,7 @@ fn make_includable_impl(path: &Path) -> Result<()> {
             std::env::current_dir().unwrap().display(),
         );
     });
+    println!("cargo:rerun-if-changed={}", path.display());
     let metadata = fs::metadata(&path)?;
 
     if metadata.is_dir() {
@@ -107,7 +108,6 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
 
     println!("cargo:rustc-link-lib=static={unique_name}");
     println!("cargo:rustc-link-search=native={out_dir}");
-    println!("cargo:rerun-if-changed={}", path.display());
     Ok(())
 }
 
