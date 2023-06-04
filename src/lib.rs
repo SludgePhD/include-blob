@@ -1,19 +1,20 @@
-pub use include_blob_macros::*;
-
+use ar_archive_writer::{
+    get_native_object_symbols, write_archive_to_stream, ArchiveKind, NewArchiveMember,
+};
+use object::{
+    write::{Object, StandardSection, Symbol, SymbolSection},
+    Architecture, BinaryFormat, Endianness, SymbolFlags, SymbolKind, SymbolScope,
+};
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeMap},
+    collections::hash_map::DefaultHasher,
     env, error,
     fs::{self, File},
     hash::{Hash, Hasher},
     io::{Seek, Write},
     path::{Path, PathBuf},
-    process::Command,
 };
 
-use object::{
-    write::{Object, StandardSection, Symbol, SymbolSection},
-    Architecture, BinaryFormat, Endianness, SymbolFlags, SymbolKind, SymbolScope,
-};
+pub use include_blob_macros::*;
 
 type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
@@ -92,19 +93,7 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
     object.write_stream(&mut obj_buf)?;
 
     let object_file_name = format!("{unique_name}.o").into_bytes();
-    write_archive(&mut out_file, &object_file_name, &obj_buf, &symbol_name)?;
-
-    if !use_gnu_archive() {
-        // builtin ranlib doesn't currently work on macOS, run external ranlib command
-        let out = Command::new("ranlib").arg(out_file_path).output()?;
-        if !out.status.success() {
-            panic!(
-                "failed to run ranlib: {:?}\nstderr:\n{}",
-                out.status,
-                String::from_utf8_lossy(&out.stderr)
-            );
-        }
-    }
+    write_archive(&info, &mut out_file, &object_file_name, &obj_buf)?;
 
     println!("cargo:rustc-link-lib=static={unique_name}");
     println!("cargo:rustc-link-search=native={out_dir}");
@@ -112,31 +101,29 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
 }
 
 fn write_archive(
+    target_info: &TargetInfo,
     out_file: &mut (impl Write + Seek),
     object_file_name: &[u8],
     object_file_contents: &[u8],
-    symbol_name: &[u8],
 ) -> Result<()> {
-    let mut symtab = BTreeMap::new();
-    symtab.insert(object_file_name.to_vec(), vec![symbol_name.to_vec()]);
+    let member = NewArchiveMember {
+        buf: Box::new(object_file_contents),
+        get_symbols: get_native_object_symbols,
+        member_name: String::from_utf8(object_file_name.to_vec()).unwrap(),
+        mtime: 0,
+        uid: 0,
+        gid: 0,
+        perms: 0o644,
+    };
+    write_archive_to_stream(
+        out_file,
+        &[member],
+        true,
+        target_info.archive_kind,
+        true,
+        false,
+    )?;
 
-    if dbg!(use_gnu_archive()) {
-        ar::GnuBuilder::new(
-            out_file,
-            vec![object_file_name.to_vec()],
-            ar::GnuSymbolTableFormat::Size32,
-            symtab,
-        )?
-        .append(
-            &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
-            &object_file_contents[..],
-        )?;
-    } else {
-        ar::Builder::new(out_file, BTreeMap::new())?.append(
-            &ar::Header::new(object_file_name.to_vec(), object_file_contents.len() as u64),
-            &object_file_contents[..],
-        )?;
-    }
     Ok(())
 }
 
@@ -144,14 +131,15 @@ struct TargetInfo {
     binfmt: BinaryFormat,
     arch: Architecture,
     endian: Endianness,
+    archive_kind: ArchiveKind,
 }
 
 impl TargetInfo {
     fn from_build_script_vars() -> Self {
-        let binfmt = match &*env::var("CARGO_CFG_TARGET_OS").unwrap() {
-            "macos" | "ios" => BinaryFormat::MachO,
-            "windows" => BinaryFormat::Coff,
-            "linux" | "android" => BinaryFormat::Elf,
+        let (binfmt, archive_kind) = match &*env::var("CARGO_CFG_TARGET_OS").unwrap() {
+            "macos" | "ios" => (BinaryFormat::MachO, ArchiveKind::Darwin64),
+            "windows" => (BinaryFormat::Coff, ArchiveKind::Gnu),
+            "linux" | "android" => (BinaryFormat::Elf, ArchiveKind::Gnu),
             unk => panic!("unhandled operating system '{unk}'"),
         };
         let arch = match &*env::var("CARGO_CFG_TARGET_ARCH").unwrap() {
@@ -180,6 +168,7 @@ impl TargetInfo {
             binfmt,
             arch,
             endian,
+            archive_kind,
         }
     }
 }
@@ -192,8 +181,4 @@ fn lib_prefix_and_suffix() -> (&'static str, &'static str) {
     } else {
         unimplemented!("target platform not supported");
     }
-}
-
-fn use_gnu_archive() -> bool {
-    &*env::var("CARGO_CFG_TARGET_VENDOR").unwrap() != "apple"
 }
