@@ -1,6 +1,6 @@
 [package]
 name = "include-blob-macros"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "0BSD"
 repository = "https://github.com/SludgePhD/Zaru"
@@ -10,4 +10,4 @@ description = "Include large binary files in an application without incurring th
 proc-macro = true
 
 [dependencies]
-syn = { version = "1.0.107", default-features = false, features = ["parsing", "proc-macro"] }
+syn = { version = "2.0.39", default-features = false, features = ["parsing", "proc-macro"] }

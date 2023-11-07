@@ -1,3 +1,7 @@
+//! Private, semver-unstable implementation details of the `include-blob` crate.
+//!
+//! Don't use this crate, use `include-blob` instead.
+
 use std::{
     collections::hash_map::DefaultHasher,
     env, fs,
