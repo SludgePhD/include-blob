@@ -3,7 +3,7 @@ members = ["include-blob-macros", "test-project"]
 
 [package]
 name = "include-blob"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 license = "0BSD"
 repository = "https://github.com/SludgePhD/include-blob"
@@ -11,6 +11,6 @@ description = "Include large binary files in an application without incurring th
 keywords = ["include", "binary", "bytes", "file"]
 
 [dependencies]
-include-blob-macros = { path = "include-blob-macros", version = "=0.1.1" }
-object = { version = "0.31.0", default-features = false, features = ["write"] }
-ar_archive_writer = "0.1.4"
+include-blob-macros = { path = "include-blob-macros", version = "=0.1.2" }
+object = { version = "0.35.0", default-features = false, features = ["write"] }
+ar_archive_writer = "0.3.0"

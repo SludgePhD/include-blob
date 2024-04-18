@@ -19,7 +19,7 @@
 //! ```
 
 use ar_archive_writer::{
-    get_native_object_symbols, write_archive_to_stream, ArchiveKind, NewArchiveMember,
+    write_archive_to_stream, ArchiveKind, NewArchiveMember, DEFAULT_OBJECT_READER,
 };
 use object::{
     write::{Object, StandardSection, Symbol, SymbolSection},
@@ -128,21 +128,14 @@ fn write_archive(
 ) -> Result<()> {
     let member = NewArchiveMember {
         buf: Box::new(object_file_contents),
-        get_symbols: get_native_object_symbols,
+        object_reader: &DEFAULT_OBJECT_READER,
         member_name: String::from_utf8(object_file_name.to_vec()).unwrap(),
         mtime: 0,
         uid: 0,
         gid: 0,
         perms: 0o644,
     };
-    write_archive_to_stream(
-        out_file,
-        &[member],
-        true,
-        target_info.archive_kind,
-        true,
-        false,
-    )?;
+    write_archive_to_stream(out_file, &[member], target_info.archive_kind, false, false)?;
 
     Ok(())
 }
