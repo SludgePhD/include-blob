@@ -1,3 +1,23 @@
+//! Include large files without the high compile time cost.
+//!
+//! This crate provides the [`include_blob!`] macro as an alternative to the standard
+//! [`include_bytes!`] macro, which embeds a file by copying it to an object file and linking to it.
+//! This can reduce the (quite high) compile time cost of [`include_bytes!`].
+//!
+//! In order for this to work, the user code has to first add a build script that calls the
+//! [`make_includable`] function.
+//!
+//! ```no_run
+//! // build.rs
+//! fn main() {
+//!     include_blob::make_includable("../../directory-with-big-files");
+//! }
+//! ```
+//!
+//! ```no_run
+//! let bytes: &[u8] = include_blob::include_blob!("test-project/blobs/file.txt");
+//! ```
+
 use ar_archive_writer::{
     get_native_object_symbols, write_archive_to_stream, ArchiveKind, NewArchiveMember,
 };
@@ -18,7 +38,7 @@ pub use include_blob_macros::*;
 
 type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
-/// Call this from your build script to make `path` includable via `include_blob!`.
+/// Call this from your build script to make `path` includable via [`include_blob!`].
 ///
 /// `path` can refer to a file or a directory (which processes every file in the directory).
 ///
