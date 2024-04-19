@@ -1,10 +1,10 @@
 [package]
 name = "include-blob-macros"
-version = "0.1.2"
+version = "1.0.0"
 edition = "2021"
 license = "0BSD"
 repository = "https://github.com/SludgePhD/include-blob"
-description = "Include large binary files in an application without incurring the compile time cost"
+description = "(semver-exempt implementation detail of `include-blob`; do not use)"
 
 [lib]
 proc-macro = true
