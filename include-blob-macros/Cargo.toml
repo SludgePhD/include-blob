@@ -1,9 +1,9 @@
 [package]
 name = "include-blob-macros"
-version = "1.0.0"
-edition = "2021"
-license = "0BSD"
-repository = "https://github.com/SludgePhD/include-blob"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "(semver-exempt implementation detail of `include-blob`; do not use)"
 
 [lib]

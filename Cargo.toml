@@ -1,17 +1,24 @@
 [workspace]
 members = ["include-blob-macros", "test-project"]
+package.repository = "https://github.com/SludgePhD/include-blob"
+package.edition = "2021"
+package.license = "0BSD"
+
+# (update these versions together to ensure that the crates remain linked together exactly)
+package.version = "1.0.0"
+dependencies.include-blob-macros = { path = "include-blob-macros", version = "=1.0.0" }
 
 [package]
 name = "include-blob"
-version = "1.0.0"
-edition = "2021"
-license = "0BSD"
-repository = "https://github.com/SludgePhD/include-blob"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "Include large binary files in an application without the compile time cost of `include_bytes!`"
 categories = ["development-tools::build-utils"]
 keywords = ["include", "binary", "bytes", "file"]
 
 [dependencies]
-include-blob-macros = { path = "include-blob-macros", version = "=1.0.0" }
+include-blob-macros.workspace = true
 object = { version = "0.36.7", default-features = false, features = ["write"] }
 ar_archive_writer = "0.4.2"
