@@ -5,8 +5,8 @@ package.edition = "2021"
 package.license = "0BSD"
 
 # (update these versions together to ensure that the crates remain linked together exactly)
-package.version = "1.0.0"
-dependencies.include-blob-macros = { path = "include-blob-macros", version = "=1.0.0" }
+package.version = "1.0.1"
+dependencies.include-blob-macros = { path = "include-blob-macros", version = "=1.0.1" }
 
 [package]
 name = "include-blob"
