@@ -6,13 +6,7 @@ on:
     - main
 
 env:
-  CARGO_NET_RETRY: 10
   RUSTUP_MAX_RETRIES: 10
-  CARGO_INCREMENTAL: 0
-  CI: 1
-  RUST_BACKTRACE: short
-  RUSTFLAGS: -D warnings
-  RUSTDOCFLAGS: -D warnings
 
 jobs:
   ci:
@@ -34,9 +28,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      uses: actions/checkout@v4
 
     - name: Install Rust toolchain
       run: rustup install stable --profile=minimal
@@ -49,7 +41,7 @@ jobs:
 
     - name: Run CI/CD
       run: sludge-cicd --target ${{ matrix.target }}
-      # NB: no token, this should only run tests
+      # (no token, this should only run tests)
 
   cd:
     name: Autopublish
@@ -61,7 +53,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
