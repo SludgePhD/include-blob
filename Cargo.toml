@@ -7,7 +7,8 @@ version = "1.0.0"
 edition = "2021"
 license = "0BSD"
 repository = "https://github.com/SludgePhD/include-blob"
-description = "Include large binary files in an application without incurring the compile time cost"
+description = "Include large binary files in an application without the compile time cost of `include_bytes!`"
+categories = ["development-tools::build-utils"]
 keywords = ["include", "binary", "bytes", "file"]
 
 [dependencies]
