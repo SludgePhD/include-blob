@@ -92,12 +92,7 @@ fn process_file(path: PathBuf, metadata: fs::Metadata) -> Result<()> {
     let info = TargetInfo::from_build_script_vars();
     let mut obj_buf = Vec::new();
     let mut object = Object::new(info.binfmt, info.arch, info.endian);
-    let (section, _) = object.add_subsection(
-        StandardSection::ReadOnlyData,
-        unique_name.as_bytes(),
-        &[],
-        1,
-    );
+    let section = object.add_subsection(StandardSection::ReadOnlyData, unique_name.as_bytes());
     let symbol_name = unique_name.as_bytes().to_vec();
     let sym = object.add_symbol(Symbol {
         name: symbol_name.clone(),
